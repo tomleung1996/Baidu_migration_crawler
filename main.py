@@ -3,6 +3,8 @@ import json
 import pymongo
 from tqdm import tqdm
 import datetime
+from time import sleep
+from random import random
 
 
 def fetch_one_loc(level, move_in, location_id, date):
@@ -127,6 +129,7 @@ def fetch_all_loc(loc_file_path: str, date: str):
                     'distribution': single_res['distribution']
                 })
             else:
+                sleep(10 * random())
                 continue
             break
 
