@@ -74,17 +74,16 @@ def fetch_one_loc(level, move_in, location_id, date):
 
         return final_result
 
-    dis_result = requests.get(dis_url, headers=headers).text
-
-    qianxi_result = requests.get(qianxi_url, headers=headers).text
-
-    start_1 = dis_result.find('(')
-    end_1 = dis_result.rfind(')')
-    start_2 = qianxi_result.find('(')
-    end_2 = qianxi_result.rfind(')')
-
     while True:
         try:
+            dis_result = requests.get(dis_url, headers=headers).text
+            qianxi_result = requests.get(qianxi_url, headers=headers).text
+
+            start_1 = dis_result.find('(')
+            end_1 = dis_result.rfind(')')
+            start_2 = qianxi_result.find('(')
+            end_2 = qianxi_result.rfind(')')
+
             dis_result = json.loads(dis_result[start_1 + 1:end_1])['data']['list']
             qianxi_result = json.loads(qianxi_result[start_2 + 1:end_2])['data']['list'][date]
 
@@ -93,7 +92,7 @@ def fetch_one_loc(level, move_in, location_id, date):
                 'distribution': dis_result
             }
 
-            if str(location_id)[-4:] != '0000' or str(location_id) in ['110000', '120000', '310000', '500000']:
+            if str(location_id)[-4:] != '0000' or str(location_id) in ['110000', '120000', '310000', '500000', '810000', '820000']:
                 internal_url = internal_url.format(location_id, date)
                 internal_result = requests.get(internal_url, headers=headers).text
                 start_3 = internal_result.find('(')
@@ -109,6 +108,7 @@ def fetch_one_loc(level, move_in, location_id, date):
             return None
         except:
             print('可能被反爬，等待后重试', location_id)
+            continue
 
         break
 
@@ -123,6 +123,7 @@ def fetch_all_loc(loc_file_path: str, date: str):
     with open(loc_file_path, mode='r', encoding='utf-8') as file:
         for line in file:
             loc, code = line.strip().split(',')
+            # 去重
             loc_id_dict[int(code)] = loc
 
     for code, loc in tqdm(loc_id_dict.items()):
@@ -145,7 +146,7 @@ def fetch_all_loc(loc_file_path: str, date: str):
                         'qianxi_index': single_res['qianxi_index'],
                         'distribution': single_res['distribution']
                     })
-                if str(code)[-4:] != '0000' or str(code) in ['110000', '120000', '310000', '500000']:
+                if str(code)[-4:] != '0000' or str(code) in ['110000', '120000', '310000', '500000', '810000', '820000']:
                     city_res.append({
                         'location': loc,
                         'code': code,
@@ -173,7 +174,7 @@ def fetch_timerange(start, end):
     while start <= end:
         date = start.strftime('%Y%m%d')
         print(date)
-        province_result, city_result = fetch_all_loc('test.txt', date)
+        province_result, city_result = fetch_all_loc('location_ids.txt', date)
 
         cn_res_c_i = fetch_one_loc('city', True, 0, date)
         cn_res_c_o = fetch_one_loc('city', False, 0, date)
@@ -193,6 +194,6 @@ def fetch_timerange(start, end):
 
 
 if __name__ == '__main__':
-    # 省级包括直辖市，不包括港澳台
-    # 市级也包括直辖市
-    fetch_timerange('20200101', '20200102')
+    # 省级包括直辖市和港澳，不包括台湾
+    # 市级也包括直辖市和港澳，不包括台湾
+    fetch_timerange('20200301', '20200301')
