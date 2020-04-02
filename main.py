@@ -184,7 +184,6 @@ def fetch_timerange(start, end):
 
         start += datetime.timedelta(days=1)
 
-        # connect_str = "mongodb://tomleung1996:1996821abc@baiduqianxi-shard-00-00-n9mzn.azure.mongodb.net:27017,baiduqianxi-shard-00-01-n9mzn.azure.mongodb.net:27017,baiduqianxi-shard-00-02-n9mzn.azure.mongodb.net:27017/test?ssl=true&replicaSet=BaiduQianxi-shard-0&authSource=admin&retryWrites=true&w=majority"
         connect_str = "mongodb://localhost"
         client = pymongo.MongoClient(connect_str)
         client.qianxi.province_flow.insert_many(province_result)
@@ -196,4 +195,4 @@ def fetch_timerange(start, end):
 if __name__ == '__main__':
     # 省级包括直辖市和港澳，不包括台湾
     # 市级也包括直辖市和港澳，不包括台湾
-    fetch_timerange('20200301', '20200301')
+    fetch_timerange('20200329', '20200330')
